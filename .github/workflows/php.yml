@@ -1,0 +1,40 @@
+name: ScecurityScan
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  security-scan:
+    name: Run Semgrep and Trufflehog
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Composer Dependencies
+        run: composer install
+
+      - name: Run Semgrep
+        run: semgrep --config=p/php,js/javascript . # Adjust the file patterns as needed
+
+      - name: Install Trufflehog
+        run: pip install trufflehog
+
+      - name: Run Trufflehog
+        run: trufflehog --regex --entropy=False .
+
+
+    # - name: Run test suite
+    #   run: composer run-script test
