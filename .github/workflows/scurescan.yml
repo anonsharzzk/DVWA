@@ -36,9 +36,4 @@ jobs:
             name: report.DVWA
             path: report.DVWA
 
-        # step 4
-        - name: publish code scanning alerts
-          uses: github/codeql-action/upload-DVWA@v2
-          with:
-            sarif_file: report.DVWA
-            category: semgrep
+     
