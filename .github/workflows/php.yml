@@ -23,9 +23,6 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install Composer Dependencies
-        run: composer install
-
       - name: Run Semgrep
         run: semgrep --config=p/php,js/javascript . # Adjust the file patterns as needed
 
