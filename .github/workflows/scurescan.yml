@@ -22,7 +22,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
+      - name: Install Semgrep
+        run: |
+          # Download and install semgrep
+          python3 -m pip install semgrep
 
+          
       - name: Run Semgrep
         run: semgrep --config=p/php,js/javascript . # Adjust the file patterns as needed
 
