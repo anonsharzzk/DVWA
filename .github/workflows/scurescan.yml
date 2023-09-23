@@ -1,4 +1,5 @@
-name: ScecurityScan
+---
+name: Semgrep Full Scan
 
 on:
   push:
@@ -6,37 +7,38 @@ on:
   pull_request:
     branches: [ "master" ]
 
-permissions:
-  contents: read
 
 jobs:
-  security-scan:
-    name: Run Semgrep and Trufflehog
-    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+  semgrep-full:
+      runs-on: ubuntu-latest
+      container:
+        image: returntocorp/semgrep
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-      - name: Install Semgrep
-        run: |
-          # Download and install semgrep
-          python3 -m pip install semgrep
+      steps:
 
-          
-      - name: Run Semgrep
-        run: semgrep --config=p/php,js/javascript . # Adjust the file patterns as needed
+        # step 1
+        - name: clone application source code
+          uses: actions/checkout@v3
 
-      - name: Install Trufflehog
-        run: pip install trufflehog
+        # step 2
+        - name: full scan
+          run: |
+            semgrep \
+              --DVWA --output report.DVWA \
+              --metrics=off \
+              --config="p/default"
 
-      - name: Run Trufflehog
-        run: trufflehog --regex --entropy=False .
+        # step 3
+        - name: save report as pipeline artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: report.DVWA
+            path: report.DVWA
 
-
-    # - name: Run test suite
-    #   run: composer run-script test
+        # step 4
+        - name: publish code scanning alerts
+          uses: github/codeql-action/upload-DVWA@v2
+          with:
+            sarif_file: report.DVWA
+            category: semgrep
